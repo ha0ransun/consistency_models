@@ -112,8 +112,9 @@ def main():
     if dist.get_rank() == 0:
         idx = 0
         while os.path.isfile(f"cifar10/figs/{idx:06d}.png"):
-            idx +=1 
+            idx += 1 
         PIL.Image.fromarray(image, 'RGB').save(f"cifar10/figs/{idx:06d}.png")
+        os.system(f'gcloud storage cp cifar10/figs/{idx:06d}.png gs://deterministic-diffusion/cifar10/{idx:06d}.png')
 
     dist.barrier()
     logger.log("sampling complete")
