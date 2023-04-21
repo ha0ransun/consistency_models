@@ -402,16 +402,24 @@ class CMTrainLoop(TrainLoop):
 
     def _update_target_ema(self):
         target_ema, scales = self.ema_scale_fn(self.global_step)
-        with th.no_grad():
-            update_ema(
-                self.target_model_master_params,
-                self.mp_trainer.master_params,
-                rate=target_ema,
-            )
-            master_params_to_model_params(
-                self.target_model_param_groups_and_shapes,
-                self.target_model_master_params,
-            )
+        if self.use_fp16:
+            with th.no_grad():
+                update_ema(
+                    self.target_model_master_params,
+                    self.mp_trainer.master_params,
+                    rate=target_ema,
+                )
+                master_params_to_model_params(
+                    self.target_model_param_groups_and_shapes,
+                    self.target_model_master_params,
+                )
+        else:
+            with th.no_grad():
+                update_ema(
+                    list(self.target_model.parameters()),
+                    self.mp_trainer.master_params,
+                    rate=target_ema,
+                )
 
     def reset_training_for_progdist(self):
         assert self.training_mode == "progdist", "Training mode must be progdist"

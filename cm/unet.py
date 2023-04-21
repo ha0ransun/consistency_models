@@ -344,7 +344,7 @@ class QKVFlashAttention(nn.Module):
         from flash_attn.flash_attention import FlashAttention
 
         assert batch_first
-        factory_kwargs = {"device": device, "dtype": dtype}
+        factory_kwargs = {}
         super().__init__()
         self.embed_dim = embed_dim
         self.num_heads = num_heads
@@ -614,6 +614,7 @@ class UNetModel(nn.Module):
                             use_checkpoint=use_checkpoint,
                             num_heads=num_heads,
                             num_head_channels=num_head_channels,
+                            attention_type="flash" if self.dtype == th.float16 else "normal",
                             use_new_attention_order=use_new_attention_order,
                         )
                     )
@@ -659,6 +660,7 @@ class UNetModel(nn.Module):
                 use_checkpoint=use_checkpoint,
                 num_heads=num_heads,
                 num_head_channels=num_head_channels,
+                attention_type="flash" if self.dtype == th.float16 else "normal",
                 use_new_attention_order=use_new_attention_order,
             ),
             ResBlock(
@@ -695,6 +697,7 @@ class UNetModel(nn.Module):
                             use_checkpoint=use_checkpoint,
                             num_heads=num_heads_upsample,
                             num_head_channels=num_head_channels,
+                            attention_type="flash" if self.dtype == th.float16 else "normal",
                             use_new_attention_order=use_new_attention_order,
                         )
                     )

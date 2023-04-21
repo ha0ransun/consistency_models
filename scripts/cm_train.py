@@ -24,7 +24,7 @@ def main():
     args = create_argparser().parse_args()
 
     dist_util.setup_dist()
-    logger.configure()
+    logger.configure(dir=args.log_dir)
 
     logger.log("creating model and diffusion...")
     ema_scale_fn = create_ema_and_scales_fn(
@@ -146,6 +146,7 @@ def main():
 def create_argparser():
     defaults = dict(
         data_dir="",
+        log_dir="",
         schedule_sampler="uniform",
         lr=1e-4,
         weight_decay=0.0,
